@@ -31,6 +31,7 @@ from maubot import Plugin, MessageEvent
 from maubot.handlers import command, event
 
 from .db import Database, Feed, Entry, Subscription
+from .youtube_rss import fixup_youtube_subscription_link
 
 
 class Config(BaseProxyConfig):
@@ -270,6 +271,7 @@ class RSSBot(Plugin):
     async def subscribe(self, evt: MessageEvent, url: str) -> None:
         if not await self.can_manage(evt):
             return
+        url = fixup_youtube_subscription_link(self.log, url)
         feed = self.db.get_feed_by_url(url)
         if not feed:
             try:
