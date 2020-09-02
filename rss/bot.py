@@ -381,7 +381,8 @@ class RSSBot(Plugin):
     @rss.subcommand("subscriptions", aliases=("ls", "list", "subs"),
                     help="List the subscriptions in the current room.")
     async def command_subscriptions(self, evt: MessageEvent) -> None:
-        subscriptions = self.db.get_feeds_by_room(evt.room_id)
+        subscriptions = sorted(self.db.get_feeds_by_room(evt.room_id), key = lambda x: x[0].title.lower())
+        #subscriptions = self.db.get_feeds_by_room(evt.room_id)
         await evt.reply("**Subscriptions in this room:**\n\n"
                         + "\n".join(self._format_subscription(feed, subscriber)
                                     for feed, subscriber in subscriptions))

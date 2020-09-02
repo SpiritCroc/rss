@@ -140,6 +140,7 @@ class Database:
                 self.db.execute(select([self.feed, self.subscription.c.user_id])
                                 .where(and_(self.subscription.c.room_id == room_id,
                                             self.subscription.c.feed_id == self.feed.c.id))))
+                                #.order_by(self.feed.c.title)))
 
     def get_rooms_by_feed(self, feed_id: int) -> Iterable[RoomID]:
         return (row[0] for row in
@@ -213,7 +214,8 @@ class Database:
     def subscribe(self, feed_id: int, room_id: RoomID, user_id: UserID) -> None:
         self.db.execute(self.subscription.insert().values(
             feed_id=feed_id, room_id=room_id, user_id=user_id,
-            notification_template="New post in $feed_title: [$title]($link)"))
+            notification_template="$feed_title: [$title]($link)"))
+            # notification_template="New post in $feed_title: [$title]($link)"))
 
     def unsubscribe(self, feed_id: int, room_id: RoomID) -> None:
         tbl = self.subscription
