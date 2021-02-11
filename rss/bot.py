@@ -29,7 +29,7 @@ from mautrix.types import (StateEvent, EventType, MessageType, RoomID, EventID,
 from maubot import Plugin, MessageEvent
 from maubot.handlers import command, event
 
-from .db import Database, Feed, Entry, Subscription
+from .db import Database, Feed, Entry, Subscription, NOTIFICATION_TEMPLATE
 from .youtube_rss import fixup_youtube_subscription_link
 
 rss_change_level = EventType.find("xyz.maubot.rss", t_class=EventType.Class.STATE)
@@ -347,8 +347,10 @@ class RSSBot(Plugin):
             await evt.reply("This room is not subscribed to that feed")
             return
         self.db.update_template(feed.id, evt.room_id, template)
+        #sub = Subscription(feed_id=feed.id, room_id=sub.room_id, user_id=sub.user_id,
+        #                   notification_template=Template(template), send_notice=sub.send_notice)
         sub = Subscription(feed_id=feed.id, room_id=sub.room_id, user_id=sub.user_id,
-                           notification_template=Template(template), send_notice=sub.send_notice)
+                           notification_template=Template(NOTIFICATION_TEMPLATE), send_notice=sub.send_notice)
         sample_entry = Entry(feed.id, "SAMPLE", datetime.now(), "Sample entry",
                              "This is a sample entry to demonstrate your new template",
                              "http://example.com")

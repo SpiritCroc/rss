@@ -30,6 +30,9 @@ Feed = NamedTuple("Feed", id=int, url=str, title=str, subtitle=str, link=str, ne
                   error_count=int, subscriptions=List[Subscription])
 Entry = NamedTuple("Entry", feed_id=int, id=str, date=datetime, title=str, summary=str, link=str)
 
+#NOTIFICATION_TEMPLATE = "$feed_title: [$title]($link)"
+# Linkify feed_title instead of title: less likely to break links this way, since title can include links, leading to broken double-links
+NOTIFICATION_TEMPLATE = "[$feed_title:]($link) $title"
 
 class Database:
     db: Engine
@@ -128,7 +131,8 @@ class Database:
                                          error_count, subscriptions=[]))
             map[feed_id].subscriptions.append(
                 Subscription(feed_id=feed_id, room_id=room_id, user_id=user_id,
-                             notification_template=Template(notification_template),
+                             #notification_template=Template(notification_template),
+                             notification_template=Template(NOTIFICATION_TEMPLATE),
                              send_notice=send_notice))
         return map.values()
 
@@ -186,7 +190,8 @@ class Database:
         try:
             (feed_id, url, title, subtitle, link, next_retry, error_count,
              room_id, user_id, template, send_notice) = next(rows)
-            notification_template = Template(template)
+            #notification_template = Template(template)
+            notification_template = Template(NOTIFICATION_TEMPLATE)
             return (Subscription(feed_id, room_id, user_id, notification_template, send_notice)
                     if room_id else None,
                     Feed(feed_id, url, title, subtitle, link, next_retry, error_count, []))
@@ -214,7 +219,7 @@ class Database:
     def subscribe(self, feed_id: int, room_id: RoomID, user_id: UserID) -> None:
         self.db.execute(self.subscription.insert().values(
             feed_id=feed_id, room_id=room_id, user_id=user_id,
-            notification_template="$feed_title: [$title]($link)"))
+            notification_template=NOTIFICATION_TEMPLATE))
             # notification_template="New post in $feed_title: [$title]($link)"))
 
     def unsubscribe(self, feed_id: int, room_id: RoomID) -> None:
