@@ -29,7 +29,7 @@ from mautrix.types import (StateEvent, EventType, MessageType, RoomID, EventID,
 from maubot import Plugin, MessageEvent
 from maubot.handlers import command, event
 
-from .db import Database, Feed, Entry, Subscription, NOTIFICATION_TEMPLATE
+from .db import Database, Feed, Entry, Subscription, NOTIFICATION_TEMPLATE, NOTIFICATION_TEMPLATE_WITH_SUMMARY, SUMMARY_BLACKLIST
 from .youtube_rss import fixup_youtube_subscription_link
 
 rss_change_level = EventType.find("xyz.maubot.rss", t_class=EventType.Class.STATE)
@@ -90,7 +90,18 @@ class RSSBot(Plugin):
             self.log.exception("Fatal error while polling feeds")
 
     async def _send(self, feed: Feed, entry: Entry, sub: Subscription) -> EventID:
-        message = sub.notification_template.safe_substitute({
+        notification_template = NOTIFICATION_TEMPLATE
+        if feed.subtitle != None and feed.subtitle != "" and feed.subtitle != feed.title:
+            notification_template = NOTIFICATION_TEMPLATE_WITH_SUMMARY
+            for site in SUMMARY_BLACKLIST:
+                if site in feed.url:
+                    notification_template = NOTIFICATION_TEMPLATE
+                    break
+        else:
+            notification_template = NOTIFICATION_TEMPLATE
+        notification_template = Template(notification_template)
+
+        message = notification_template.safe_substitute({
             "feed_url": feed.url,
             "feed_title": feed.title,
             "feed_subtitle": feed.subtitle,

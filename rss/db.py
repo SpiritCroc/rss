@@ -33,6 +33,9 @@ Entry = NamedTuple("Entry", feed_id=int, id=str, date=datetime, title=str, summa
 #NOTIFICATION_TEMPLATE = "$feed_title: [$title]($link)"
 # Linkify feed_title instead of title: less likely to break links this way, since title can include links, leading to broken double-links
 NOTIFICATION_TEMPLATE = "[$feed_title:]($link) $title"
+# Having summary "hardcoded" into the template is not ideal for twitter (title = summary) - let's add it from code
+NOTIFICATION_TEMPLATE_WITH_SUMMARY = "[$feed_title:]($link) $title\n\n$summary"
+SUMMARY_BLACKLIST = ["youtube.com", "nitter"]
 
 class Database:
     db: Engine
