@@ -108,7 +108,7 @@ class RSSBot(Plugin):
             "feed_link": feed.link,
             **entry._asdict(),
         })
-        msgtype = MessageType.NOTICE if sub.send_notice else MessageType.TEXT
+        msgtype = MessageType.TEXT #MessageType.NOTICE if sub.send_notice else MessageType.TEXT
         try:
             return await self.client.send_markdown(sub.room_id, message, msgtype=msgtype,
                                                    allow_html=True)
