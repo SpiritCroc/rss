@@ -122,7 +122,7 @@ class RSSBot(Plugin):
         if spam_sleep >= 0:
             for task in tasks:
                 await task
-                await asyncio.sleep(spam_sleep, loop=self.loop)
+                await asyncio.sleep(spam_sleep)
         else:
             await asyncio.gather(*tasks)
 
@@ -170,7 +170,7 @@ class RSSBot(Plugin):
                 self.log.debug("Polling stopped")
             except Exception:
                 self.log.exception("Error while polling feeds")
-            await asyncio.sleep(self.config["update_interval"] * 60, loop=self.loop)
+            await asyncio.sleep(self.config["update_interval"] * 60)
 
     async def try_parse_feed(self, feed: Optional[Feed] = None) -> Tuple[Feed, Iterable[Entry]]:
         try:
