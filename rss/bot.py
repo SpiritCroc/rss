@@ -31,6 +31,7 @@ from maubot.handlers import command, event
 
 from .db import Database, Feed, Entry, Subscription, NOTIFICATION_TEMPLATE, NOTIFICATION_TEMPLATE_WITH_SUMMARY, SUMMARY_BLACKLIST
 from .youtube_rss import fixup_youtube_subscription_link
+from .github_rss import fixup_github_link
 
 rss_change_level = EventType.find("xyz.maubot.rss", t_class=EventType.Class.STATE)
 
@@ -312,6 +313,7 @@ class RSSBot(Plugin):
         if not await self.can_manage(evt):
             return
         url = fixup_youtube_subscription_link(self.log, url)
+        url = fixup_github_link(self.log, url)
         feed = self.db.get_feed_by_url(url)
         if not feed:
             try:
